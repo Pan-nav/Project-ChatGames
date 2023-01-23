@@ -32,7 +32,7 @@ public class ChatGames implements CommandExecutor {
 
         player.sendMessage(ChatColor.YELLOW + "Chat Games started!");
 
-
+        //Retrieving the number of questions, will use it in future to get the path of new questions and answers
         ConfigurationSection questionSection = main.getConfig().getConfigurationSection("Questions");
 
         for (String questionNumber : questionSection.getKeys(false)) {
@@ -45,9 +45,11 @@ public class ChatGames implements CommandExecutor {
 
         scheduler.scheduleSyncRepeatingTask(main, () -> {
 
+            //getting a random field
             int rand = new Random().nextInt(keys.size());
             ConfigurationSection sec = keys.get(rand);
 
+            //broadcasting question and setting answer to a variable
             Bukkit.broadcastMessage(sec.getString("question"));
             currentTask = sec.getString("answer");
 
@@ -55,7 +57,7 @@ public class ChatGames implements CommandExecutor {
 
 
 
-
+        //getting the task id to use it for cancelling in future
         task = scheduler.scheduleSyncRepeatingTask(main, () -> {
 
             currentTask = null;   //ending the task by nullifying the current answer

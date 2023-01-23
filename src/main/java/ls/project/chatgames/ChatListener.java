@@ -21,9 +21,6 @@ public class ChatListener implements Listener {
 
         ItemStack reward = new ItemStack(Material.DIAMOND);
 
-        System.out.println(games.currentTask);
-        System.out.println(message);
-
         if (message.equalsIgnoreCase(games.currentTask)){   //checking if the message sent by player is the same as the answer
             e.getPlayer().getInventory().addItem(reward);
             Bukkit.broadcastMessage(ChatColor.AQUA + e.getPlayer().getName() + " Has answered the question!");
