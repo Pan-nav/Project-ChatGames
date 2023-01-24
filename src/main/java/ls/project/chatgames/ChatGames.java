@@ -7,68 +7,54 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitScheduler;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ChatGames implements CommandExecutor {
 
-    private final Main main = Main.instance;
+    private Main main;
 
-    private final List<ConfigurationSection> keys = new ArrayList<>();
+    public ChatGames(Main main){
+        this.main = main;
+    }
 
-    private final BukkitScheduler scheduler = Bukkit.getScheduler();
-
-    public String currentTask;
-
-    public int task;
+    public String answer;
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (!(sender instanceof Player player)) return false;
 
         player.sendMessage(ChatColor.YELLOW + "Chat Games started!");
+        List<ConfigurationSection> keys = main.getKeys();
 
-        //Retrieving the number of questions, will use it in future to get the path of new questions and answers
-        ConfigurationSection questionSection = main.getConfig().getConfigurationSection("Questions");
-
-        for (String questionNumber : questionSection.getKeys(false)) {
-
-            ConfigurationSection question = questionSection.getConfigurationSection(questionNumber);
-
-            keys.add(question);
-        }
-
-
-        scheduler.scheduleSyncRepeatingTask(main, () -> {
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(main, () -> {
 
             //getting a random field
-            int rand = new Random().nextInt(keys.size());
+            int rand = ThreadLocalRandom.current().nextInt(keys.size());
             ConfigurationSection sec = keys.get(rand);
 
             //broadcasting question and setting answer to a variable
             Bukkit.broadcastMessage(sec.getString("question"));
-            currentTask = sec.getString("answer");
+            answer = sec.getString("answer");
 
         }, 0L, 6000L);
 
 
 
         //getting the task id to use it for cancelling in future
-        task = scheduler.scheduleSyncRepeatingTask(main, () -> {
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(main, () -> {
 
-            currentTask = null;   //ending the task by nullifying the current answer
+            answer = null;   //ending the task by nullifying the current answer
             Bukkit.broadcastMessage("Current task set to null");
 
         }, 1200L, 1200L);
 
 
-
         return false;
     }
 
+    public String getAnswer(){return answer;}
 
 }

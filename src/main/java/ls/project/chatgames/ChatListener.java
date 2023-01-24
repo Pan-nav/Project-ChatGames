@@ -11,8 +11,11 @@ import org.bukkit.inventory.ItemStack;
 
 public class ChatListener implements Listener {
 
-    Main main = Main.instance;
-    ChatGames games = main.getGames();
+    private final Main main;
+
+    public ChatListener(Main main){
+        this.main = main;
+    }
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent e) {
@@ -21,12 +24,11 @@ public class ChatListener implements Listener {
 
         ItemStack reward = new ItemStack(Material.DIAMOND);
 
-        if (message.equalsIgnoreCase(games.currentTask)){   //checking if the message sent by player is the same as the answer
+        if (message.equalsIgnoreCase(main.getGames().getAnswer())){   //checking if the message sent by player is the same as the answer
             e.getPlayer().getInventory().addItem(reward);
             Bukkit.broadcastMessage(ChatColor.AQUA + e.getPlayer().getName() + " Has answered the question!");
 
-            games.currentTask = null; //setting the answer to null
-            Bukkit.getScheduler().cancelTask(games.task); //cancelling the runnable to set answer to null periodically
+            main.getGames().answer = null; //setting the answer to null
         }
 
     }
